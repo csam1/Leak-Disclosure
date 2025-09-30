@@ -1,6 +1,7 @@
 import config from "./config.js";
 import express from "express";
 import cors from "cors";
+import searchRouter from "./router/search.js"
 
 const app = express();
 
@@ -9,6 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = config.PORT || 1337;
+
+app.use("/api",searchRouter)
 
 app.get("/",(req,res)=>{
     res.json({

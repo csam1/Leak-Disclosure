@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import config from "../config";
+import config from "../config.js";
 
 const SUPABASE_URL = config.SUPABASE_URL
 const SUPABASE_KEY = config.SUPABASE_KEY
