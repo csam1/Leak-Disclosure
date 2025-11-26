@@ -33,14 +33,14 @@ router.get("/me", verifyAuthUser, async (req, res) => {
     const { data: analyticsData, error: analyticsError } = await supabase
       .from("analytics_cache")
       .select("total_searches", "total_breaches")
-      .eq("id", authData.id)
+      .eq("user_id", authData.id)
       .single();
     if (analyticsError)
       return res.status(400).json({ error: analyticsError.message });
     res.json({
-      authData,
-      analyticsData,
-    });
+  user: authData,
+  analytics: analyticsData
+});
   } catch (error) {
     console.error("Internal error in /me:", error);
     return res.status(500).json({ error: "Internal server error" });
