@@ -30,10 +30,11 @@ router.post("/search", async (req,res)=>{
         })
     }
     return res.json({
-        message: "Breaches found",
-        email: data.email,
-        breaches: data.breaches
-    })
+  email: data.email,
+  breaches: data.breaches || [],
+  message: data.breaches?.length ? "Breaches found" : "No breaches found"
+});
+
 })
 
 router.post('/detailed-search', async (req, res) => {
