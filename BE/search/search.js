@@ -26,6 +26,9 @@ router.post("/search", async (req, res) => {
     .select("id")
     .eq("clerk_id", req.clerkId)
     .single();
+
+    const userId = user_id?.id;
+
   if (!user_id || user_id_error) {
     return res.json({
       message: "there is something wrong in verifying you",
@@ -52,33 +55,38 @@ router.post("/search", async (req, res) => {
 
   const { data: search_insert, error: search_insert_error } = await supabase
     .from("searches")
-    .insert({ user_id, validEmail, breachedBoolean, count });
+    .insert({
+  user_id: userId,
+  email: validEmail,
+  breached: breachedBoolean,
+  breach_count: count,
+})
   if (search_insert_error) {
     return res.json({
       message: "Failed to insert to DB",
     });
   }
-  const { data: analytics_data, error: analytics_data_error } = await supabase
-    .from("analytics_cache")
-    .upsert(
-      {
-        user_id,
-        total_searches: searches,
-        total_breached: breached,
-        updated_at: new Date(),
-      },
-      { onConflict: ["user_id"] }
-    )
-    .select();
 
-  await supabase
-    .from("analytics_cache")
-    .update({
-      total_searches: supabase.raw("total_searches + ?", [searches]),
-      total_breached: supabase.raw("total_breached + ?", [breached]),
-      updated_at: new Date(),
-    })
-    .eq("user_id", user_id);
+  const { data: analyticsRow } = await supabase
+  .from("analytics_cache")
+  .select("*")
+  .eq("user_id", userId)
+  .single();
+
+if (analyticsRow) {
+  await supabase.from("analytics_cache").update({
+    total_searches: analyticsRow.total_searches + 1,
+    total_breached: analyticsRow.total_breached + (breachedBoolean ? 1 : 0),
+    updated_at: new Date(),
+  }).eq("user_id", userId);
+} else {
+  await supabase.from("analytics_cache").insert({
+    user_id: userId,
+    total_searches: 1,
+    total_breached: breachedBoolean ? 1 : 0,
+    updated_at: new Date(),
+  });
+}
 
   return res.json({
     email: apiData.email,
