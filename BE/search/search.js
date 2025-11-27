@@ -76,15 +76,13 @@ router.post("/search", async (req, res) => {
 if (analyticsRow) {
   await supabase.from("analytics_cache").update({
     total_searches: analyticsRow.total_searches + 1,
-    total_breached: analyticsRow.total_breached + (breachedBoolean ? 1 : 0),
-    updated_at: new Date(),
+    total_breached: analyticsRow.total_breached + count,
   }).eq("user_id", userId);
 } else {
   await supabase.from("analytics_cache").insert({
     user_id: userId,
     total_searches: 1,
-    total_breached: breachedBoolean ? 1 : 0,
-    updated_at: new Date(),
+    total_breached: count,
   });
 }
 
@@ -107,6 +105,20 @@ router.post("/detailed-search", async (req, res) => {
   const validEmail = validatedData.data;
   console.log(validEmail);
 
+  const { data: user_id, error: user_id_error } = await supabase
+    .from("users")
+    .select("id")
+    .eq("clerk_id", req.clerkId)
+    .single();
+
+    const userId = user_id?.id;
+
+  if (!user_id || user_id_error) {
+    return res.json({
+      message: "there is something wrong in verifying you",
+    });
+  }
+  
   const detailedBreached = await fetch(
     `https://api.xposedornot.com/v1/breach-analytics?email=${validEmail}`
   );
@@ -125,6 +137,43 @@ router.post("/detailed-search", async (req, res) => {
   if (detailedData.detail === "Not found") {
     return res.json({ message: "No detailed breaches found for this email" });
   }
+
+  console.log(detailedData.BreachesSummary);
+  const breachedCount = detailedData.BreachesSummary.site.split(";").length;
+  console.log(breachedCount);
+  
+  const { data: search_insert, error: search_insert_error } = await supabase
+    .from("searches")
+    .insert({
+  user_id: userId,
+  email: validEmail,
+  breached: breachedBoolean,
+  breach_count: breachedCount,
+})
+  if (search_insert_error) {
+    return res.json({
+      message: "Failed to insert to DB",
+    });
+  }
+
+  const { data: analyticsRow } = await supabase
+  .from("analytics_cache")
+  .select("*")
+  .eq("user_id", userId)
+  .single();
+
+if (analyticsRow) {
+  await supabase.from("analytics_cache").update({
+    total_searches: analyticsRow.total_searches + 1,
+    total_breached: analyticsRow.total_breached + breachedCount,
+  }).eq("user_id", userId);
+} else {
+  await supabase.from("analytics_cache").insert({
+    user_id: userId,
+    total_searches: 1,
+    total_breached: breachedCount,
+  });
+}
   return res.json({
     message: "Detailed breaches found",
     industries: detailedData.BreachMetrics.industry,
