@@ -1,20 +1,10 @@
 import express from "express";
 import supabase from "../db/index.js";
 const router = express.Router();
-import { getAuth } from "@clerk/express";
+import authMiddleware from "../middleware/authMiddleware.js";
 
-const verifyAuthUser = (req, res, next) => {
-  const auth = getAuth(req);
-  if (!auth?.isAuthenticated)
-    return res.status(401).json({ message: "Unauthorized" });
-  if (auth.sessionClaims.metadata.role !== "user") {
-    return res.status(401).json({ message: "you are not user" });
-  }
-  req.clerkId = auth.userId;
-  next();
-};
 
-router.get("/me", verifyAuthUser, async (req, res) => {
+router.get("/me", authMiddleware, async (req, res) => {
   const clerkId = req.clerkId;
   try {
     const { data: authData, error: authError } = await supabase
