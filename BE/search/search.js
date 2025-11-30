@@ -8,10 +8,11 @@ const emailSchema = z.email({
   error: "Invalid email format send correct email",
 });
 
-router.post("/search", async (req, res) => {
+router.post("/search", authMiddleware,async (req, res) => {
   var breachedBoolean = true;
   const { email } = req.body;
-  console.log(email);
+  console.log(req.clerkId);
+  
   const validatedData = emailSchema.safeParse(email);
   if (!validatedData.success) {
     return res.json({
@@ -19,7 +20,6 @@ router.post("/search", async (req, res) => {
     });
   }
   const validEmail = validatedData.data;
-  console.log(validEmail);
 
   const { data: user_id, error: user_id_error } = await supabase
     .from("users")
@@ -27,7 +27,10 @@ router.post("/search", async (req, res) => {
     .eq("clerk_id", req.clerkId)
     .single();
 
+    console.log(user_id);
+    
     const userId = user_id?.id;
+
 
   if (!user_id || user_id_error) {
     return res.json({
@@ -94,7 +97,8 @@ if (analyticsRow) {
   });
 });
 
-router.post("/detailed-search", async (req, res) => {
+router.post("/detailed-search", authMiddleware ,async (req, res) => {
+    var breachedBoolean = true;
   const { email } = req.body;
   const validatedData = emailSchema.safeParse(email);
   if (!validatedData.success) {
@@ -103,7 +107,7 @@ router.post("/detailed-search", async (req, res) => {
     });
   }
   const validEmail = validatedData.data;
-  console.log(validEmail);
+  console.log(req.clerkId);
 
   const { data: user_id, error: user_id_error } = await supabase
     .from("users")
@@ -118,23 +122,26 @@ router.post("/detailed-search", async (req, res) => {
       message: "there is something wrong in verifying you",
     });
   }
-  
+
   const detailedBreached = await fetch(
     `https://api.xposedornot.com/v1/breach-analytics?email=${validEmail}`
   );
   const detailedData = await detailedBreached.json();
   console.log(detailedData);
   if (detailedData.BreachMetrics === null) {
+     breachedBoolean = false;
     return res.json({
       message: "No detailed breaches found for this email",
     });
   }
   if (detailedData.ExposedBreaches === null) {
+     breachedBoolean = false;
     return res.json({
       message: "No detailed breaches found for this email",
     });
   }
   if (detailedData.detail === "Not found") {
+     breachedBoolean = false;
     return res.json({ message: "No detailed breaches found for this email" });
   }
 
