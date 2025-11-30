@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTheme } from '../context/ThemeContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useAuth } from '@clerk/clerk-react'
 
 const Details = ({ canSearch, userPlan, searchCount, onSearch }) => {
   const { isDark } = useTheme();
@@ -8,6 +9,7 @@ const Details = ({ canSearch, userPlan, searchCount, onSearch }) => {
   const [loading, setLoading] = useState(false);
   const [details, setDetails] = useState(null);
   const [error, setError] = useState("");
+  const { getToken } = useAuth();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -29,12 +31,14 @@ const Details = ({ canSearch, userPlan, searchCount, onSearch }) => {
     setDetails(null);
 
     try {
+      const token = await getToken();
       const API_BASE_URL =
         import.meta.env.VITE_API_BASE_URL || "http://localhost:1337";
       const response = await fetch(`${API_BASE_URL}/api/detailed-search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ email }),
       });

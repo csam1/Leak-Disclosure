@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '@clerk/clerk-react'
 
 const SearchMail = ({ canSearch, userPlan, searchCount, onSearch }) => {
   const { isDark } = useTheme()
@@ -7,6 +8,7 @@ const SearchMail = ({ canSearch, userPlan, searchCount, onSearch }) => {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
+  const { getToken } = useAuth();
 
   const handleSearch = async (e) => {
     e.preventDefault()
@@ -26,11 +28,13 @@ const SearchMail = ({ canSearch, userPlan, searchCount, onSearch }) => {
     setResult(null)
 
     try {
+      const token = await getToken();
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:1337'
       const response = await fetch(`${API_BASE_URL}/api/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ email }),
       })
