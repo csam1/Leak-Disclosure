@@ -15,6 +15,7 @@ const Dashboard = () => {
   const [userPlan, setUserPlan] = useState('free') // 'free' or 'pro'
   const [searchCount, setSearchCount] = useState(0)
 
+
   // Redirect if not authenticated
   useEffect(() => {
     if (!isSignedIn) {
@@ -60,9 +61,22 @@ const Dashboard = () => {
     <div className={`min-h-screen ${isDark ? 'bg-[#0a0a0a]' : 'bg-gray-50'} transition-colors duration-300`}>
       {/* Header */}
       <header className={`${isDark ? 'bg-[#1a1a1a] border-[#2a2a2a]' : 'bg-white border-gray-200'} shadow-sm border-b transition-colors duration-300`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-w-screen px-6">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
+                <span className={`h-10 w-10 ${isDark ? 'text-white':'text-black'}`}><svg fill="currentColor" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+<g id="Cyber_security">
+
+<path d="M80.9175,377.0605H202V439.16H139a9.8965,9.8965,0,1,0,0,19.7929H373a9.8965,9.8965,0,1,0,0-19.7929H310V377.0605H431.0869A49.9019,49.9019,0,0,0,480.64,332.9351H31.36A49.9094,49.9094,0,0,0,80.9175,377.0605Z"/>
+
+<path d="M431.0869,53.0474H80.9175A49.9181,49.9181,0,0,0,31,102.9637V313.1421H481V102.9637A49.9144,49.9144,0,0,0,431.0869,53.0474ZM337,179.5835a83.01,83.01,0,0,1-43.1807,72.8317L256,273.0947l-37.8149-20.6795A83.0054,83.0054,0,0,1,175,179.5835V118.9324l81-25.8377,81,25.8377Z"/>
+
+<path d="M223.6035,165.0991a32.3247,32.3247,0,0,0,22.5,30.6881V223.59a9.8965,9.8965,0,1,0,19.793,0V195.7872a32.3292,32.3292,0,1,0-42.293-30.6881Z"/>
+
+</g>
+
+</svg></span>
               <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Leak Disclosure</h1>
             </div>
             <div className="flex items-center gap-4">
@@ -100,14 +114,7 @@ const Dashboard = () => {
                 </span>
               )}
               <div className="flex items-center gap-2">
-                <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{user?.emailAddresses[0]?.emailAddress}</span>
-                <UserButton 
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-10 h-10"
-                    }
-                  }}
-                />
+                
               </div>
             </div>
           </div>
@@ -165,8 +172,18 @@ const Dashboard = () => {
               </div>
             </button>
           </nav>
+          
+          <div className={`p-4 mt-4 border-t ${isDark ? 'border-[#2a2a2a]' : 'border-gray-200'}`}>
+            <div className="flex flex-row-reverse items-center justify-end gap-4 py-4"><span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{user.fullName}</span>
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-30 h-30"
+                    }
+                  }}
+                />
+                </div>
           {userPlan === 'free' && (
-            <div className={`p-4 mt-4 border-t ${isDark ? 'border-[#2a2a2a]' : 'border-gray-200'}`}>
               <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 <p className="font-medium mb-1">Search Limit</p>
                 <p>{searchCount}/10 searches used</p>
@@ -177,8 +194,8 @@ const Dashboard = () => {
                   ></div>
                 </div>
               </div>
-            </div>
           )}
+          </div>
         </aside>
 
         {/* Main Content */}
