@@ -6,6 +6,7 @@ import authRouter from "./auth/auth.js"
 // import "./monitor/monitorCron.js"
 import clerkWebook from "./webhook/webhook.js"
 import { clerkMiddleware } from "@clerk/express";
+import stripeGateway from "./subscription/subscription.js"
 
 const app = express();
 
@@ -18,7 +19,8 @@ const PORT = config.PORT || 1337;
 
 app.use('/api/webhook', clerkWebook)
 app.use("/api",searchRouter);
-app.use("api/auth",authRouter);
+app.use("/api/auth",authRouter);
+app.use("/api/stripe",stripeGateway)
 
 app.get("/",(req,res)=>{
     res.json({
