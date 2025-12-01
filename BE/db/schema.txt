@@ -35,9 +35,10 @@ create table monitored_emails (
 create table subscriptions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references users(id) on delete cascade,
-  razorpay_customer_id text not null,
-  razorpay_subscription_id text not null,
-  status text not null default 'active', -- active, cancelled, etc.
+  razorpay_order_id text not null,
+  razorpay_payment_id text not null,
+  payment_status text not null default 'pending', -- pending, completed, failed
+  subscription_status text not null default 'pending', -- active, cancelled, etc.
   plan text not null default 'pro',
   current_period_end timestamp,
   created_at timestamp default now()
