@@ -112,7 +112,7 @@ if(!last_search_table){
     count: count,
   });
 } else if(user_subscription === "free"){
-    //i will try this later
+    return res.json({message:"under construction"})
 } else{
     return res.json({
         message:"you are neither a free user nor a pro user we are having difficulty in identifying you"
