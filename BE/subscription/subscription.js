@@ -27,12 +27,12 @@ router.post("/stripe-checkout",async (req,res)=>{
             cancel_url:"http://localhost:5173/stripe/cancel",
             customer_email: custEmail,
             metadata:{
-                userId:"user-1337-6969-io",
+                userId: userId,
                 plan: "pro"
             },
             subscription_data: {
     metadata: {
-      userId: "user-1337-6969-io",
+      userId: userId,
       plan: "pro"
     }
   },
